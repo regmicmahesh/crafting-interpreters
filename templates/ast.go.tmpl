@@ -1,0 +1,34 @@
+package ast
+
+import (
+	"github.com/regmicmahesh/crafting-interpreters/token"
+)
+
+type Visitor interface {
+    {{- range $key, $value := . }}
+    Visit{{ $key }}Expr(expr *{{ $key }}) string
+    {{- end }}
+}
+
+type Expr interface {
+	Accept(visitor Visitor) string
+}
+
+{{- range $key, $value := . }}
+
+type {{ $key }} struct {
+    {{- range $value }}
+    {{ range . }} {{ . }} {{- end }} {{- end }}
+}
+
+func (expr *{{ $key }}) Accept(visitor Visitor) string {
+    return visitor.Visit{{ $key }}Expr(expr)
+}
+
+func New{{ $key }}({{ range $value }}{{ index . 0 | ToLower }} {{ index . 1 }}, {{- end }}) *{{ $key }} {
+    return &{{ $key }}{ {{ range $value }}{{ index . 0 | ToLower }}, {{- end }} }
+
+}
+
+
+{{ end }}
